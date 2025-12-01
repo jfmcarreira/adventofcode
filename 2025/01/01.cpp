@@ -16,19 +16,7 @@ struct Action
     std::int64_t count{0};
 };
 
-auto action_to_offset(const Action& action) noexcept
-{
-    return action.dir == Direction::Left ? -action.count : action.count;
-}
-
-auto wrap_index(std::int64_t index) noexcept
-{
-    constexpr std::int64_t kMaxValue{100};
-    if (index >= 0) return index % kMaxValue;
-    auto wrapped = index % kMaxValue;
-    if (wrapped < 0) return wrapped + kMaxValue;
-    return wrapped;
-}
+constexpr std::int64_t kMaxValue{100};
 
 int main(int argc, char* argv[])
 {
@@ -50,11 +38,32 @@ int main(int argc, char* argv[])
     std::int64_t current_index{50};
     std::int64_t zero_count{0};
     for (const auto& action : actions) {
-        current_index = wrap_index(current_index + action_to_offset(action));
-        if (current_index == 0) {
-            ++zero_count;
+        if (action.dir == Direction::Left) {
+            if (current_index == 0) {
+                current_index = kMaxValue;
+            }
+            for (std::int64_t i = 0; i < action.count; ++i) {
+                current_index -= 1;
+                if (current_index == 0) {
+                    ++zero_count;
+                    current_index = kMaxValue;
+                }
+            }
+        } else {
+            if (current_index == kMaxValue) {
+                current_index = 0;
+            }
+            for (std::int64_t i = 0; i < action.count; ++i) {
+                current_index += 1;
+                if (current_index == kMaxValue) {
+                    ++zero_count;
+                    current_index = 0;
+                }
+            }
         }
     }
     std::cout << zero_count << std::endl;
     return 0;
 }
+
+// Solution: 6254
