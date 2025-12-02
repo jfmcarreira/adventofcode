@@ -12,3 +12,4 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2c -Wall")
 
 add_subdirectory(01)
+add_subdirectory(02)

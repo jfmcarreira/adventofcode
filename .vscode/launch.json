@@ -12,12 +12,32 @@
             "cwd": "${command:cmake.launchTargetDirectory}",
         },
         {
+            "name": "Run Puzzle with inline input",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [
+                "inline_example",
+            ],
+            "cwd": "${command:cmake.launchTargetDirectory}",
+        },
+        {
             "name": "Run Puzzle with main input",
             "type": "lldb",
             "request": "launch",
             "program": "${command:cmake.launchTargetPath}",
             "args": [
                 "test_input",
+            ],
+            "cwd": "${command:cmake.launchTargetDirectory}",
+        },
+        {
+            "name": "Run Puzzle with inline main input",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "args": [
+                "inline_test",
             ],
             "cwd": "${command:cmake.launchTargetDirectory}",
         }
