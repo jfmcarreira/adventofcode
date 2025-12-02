@@ -30,16 +30,6 @@
                 "test_input",
             ],
             "cwd": "${command:cmake.launchTargetDirectory}",
-        },
-        {
-            "name": "Run Puzzle with inline main input",
-            "type": "lldb",
-            "request": "launch",
-            "program": "${command:cmake.launchTargetPath}",
-            "args": [
-                "inline_test",
-            ],
-            "cwd": "${command:cmake.launchTargetDirectory}",
         }
     ]
 }

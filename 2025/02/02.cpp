@@ -53,12 +53,23 @@ constexpr auto split_by_comma(std::string_view input) noexcept -> std::pair<std:
     return std::make_pair(comma_index == std::string_view::npos ? input.size() : comma_index + 1, id_range);
 }
 
-constexpr auto is_invalid_id(std::int64_t number)
+constexpr auto is_invalid_id_digits(std::span<const std::int64_t> digits, std::int64_t repeat_count) noexcept
+{
+    auto count = digits.size();
+    if (count % repeat_count != 0) return false;
+    auto reference = std::span{digits}.subspan(0, count / repeat_count);
+    auto checks = std::views::iota(1) | std::views::take(repeat_count - 1);
+    return std::ranges::all_of(checks, [&](auto index) {
+        return std::ranges::equal(
+            reference, std::span{digits}.subspan(index * count / repeat_count, count / repeat_count));
+    });
+}
+
+constexpr auto is_invalid_id(std::int64_t number) noexcept
 {
     auto digits = to_digits(number);
-    auto count = digits.size();
-    if (count % 2 != 0) return false;
-    return std::ranges::equal(std::span{digits}.subspan(0, count / 2), std::span{digits}.subspan(count / 2));
+    auto repeats = std::views::iota(2ULL, digits.size() + 1);
+    return std::ranges::any_of(repeats, [&](auto repeat_count) { return is_invalid_id_digits(digits, repeat_count); });
 }
 
 constexpr auto day_two_puzzle(std::string_view input) noexcept -> std::int64_t
@@ -75,6 +86,9 @@ constexpr auto day_two_puzzle(std::string_view input) noexcept -> std::int64_t
         return std::views::iota(range.start, range.end + 1) | std::views::filter(is_invalid_id);
     };
     auto invalid_ids = id_ranges | std::views::transform(compute_invalid_ids) | std::views::join;
+    // for (auto number : invalid_ids) {
+    //     std::cout << number << std::endl;
+    // }
     return std::ranges::fold_left(invalid_ids, 0, std::plus<>{});
 }
 
@@ -85,7 +99,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    static_assert(day_two_puzzle(kExampleInput) == 1227775554);
+    static_assert(day_two_puzzle(kExampleInput) == 4174379265);
 
     std::ifstream file(argv[1]);
     std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -95,4 +109,4 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-// 16793817782
+// 27469417404
