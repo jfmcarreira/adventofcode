@@ -18,3 +18,4 @@ endfunction()
 
 add_puzzle(01)
 add_puzzle(02)
+add_puzzle(03)
