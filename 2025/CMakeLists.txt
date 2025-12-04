@@ -11,5 +11,10 @@ set(CMAKE_COLOR_MAKEFILE   ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2c -Wall")
 
-add_subdirectory(01)
-add_subdirectory(02)
+function(add_puzzle TARGET_NAME )
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME})
+add_executable(${TARGET_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/${TARGET_NAME}/main.cpp")
+endfunction()
+
+add_puzzle(01)
+add_puzzle(02)
