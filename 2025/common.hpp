@@ -29,11 +29,11 @@ constexpr auto parse_input(std::string_view input, F&& parsing) noexcept
 
 constexpr auto lines_to_rows(std::string_view input) noexcept
 {
-    std::vector<std::string_view> rows;
+    std::vector<std::string> rows;
     while (!input.empty()) {
         auto line_break_pos = input.find('\n');
         auto line = input.substr(0, line_break_pos);
-        rows.push_back(line);
+        rows.push_back(std::string{line});
         if (line_break_pos == std::string_view::npos) break;
         input = input.substr(line_break_pos + 1);
     }
