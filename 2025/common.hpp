@@ -1,10 +1,18 @@
 #ifndef _COMMON_HPP_
 #define _COMMON_HPP_
 
+#include <charconv>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
+
+constexpr auto from_chars(std::string_view input) noexcept -> std::int64_t
+{
+    std::int64_t value{0};
+    auto [p, ec] = std::from_chars(input.begin(), input.end(), value);  // NOLINT
+    return value;
+}
 
 template<typename F>
 auto parse_file(const std::filesystem::path& file_name, F&& parsing) noexcept
