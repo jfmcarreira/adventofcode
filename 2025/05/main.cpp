@@ -38,16 +38,24 @@ constexpr auto solve(std::string_view input) noexcept -> std::int64_t
         input = input.substr(line_break_pos + 1);
     }
 
-    auto is_fresh = [&fresh_range](const auto& ingredient) {
-        auto found = std::ranges::any_of(
-            fresh_range, [&](const auto& range) { return ingredient >= range.start && ingredient <= range.end; });
-        return found ? 1 : 0;
-    };
-    return std::ranges::fold_left(available | std::views::transform(is_fresh), 0, std::plus<>{});
+    std::ranges::sort(fresh_range, std::less<>{}, &Range::start);
+    for (std::int64_t i = 1; i < fresh_range.size(); ++i) {
+        fresh_range[i].start = std::max(fresh_range[i].start, fresh_range[i - 1].end + 1);
+        if (fresh_range[i].end < fresh_range[i - 1].end) {
+            fresh_range[i].end = fresh_range[i].start - 1;
+        }
+    }
+
+    return std::ranges::fold_left(
+        fresh_range | std::views::transform([](const auto& range) { return range.end - range.start + 1; }),
+        0,
+        std::plus<>{});
 }
 
 int main(int argc, char* argv[])
 {
-    static_assert(solve(kExampleInput) == 3);
+    static_assert(solve(kExampleInput) == 14);
     run_solution(argc, argv, kExampleInput, solve);
 }
+
+// 342018167474526
