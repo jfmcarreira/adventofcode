@@ -2,9 +2,11 @@
 #define _COMMON_HPP_
 
 #include <charconv>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <system_error>
 #include <vector>
 
 constexpr auto from_chars(std::string_view input) noexcept -> std::int64_t
@@ -60,6 +62,10 @@ constexpr auto run_solution(int argc, char* argv[], std::string_view example_inp
         auto result = solve(example_input);
         std::cout << result << std::endl;
         return 0;
+    }
+    std::error_code ec;
+    if (!std::filesystem::exists(filename, ec)) {
+        return 1;
     }
     std::ifstream file(argv[1]);
     std::string str((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
