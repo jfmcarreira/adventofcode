@@ -5,10 +5,7 @@ set(YEAR_FOLDER ${CMAKE_CURRENT_SOURCE_DIR} )
 set(CMAKE_C_COMPILER /opt/homebrew/Cellar/llvm/20.1.8/bin/clang)
 set(CMAKE_CXX_COMPILER /opt/homebrew/Cellar/llvm/20.1.8/bin/clang++)
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_COLOR_MAKEFILE   ON)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++2c -Wall")
 
 function(add_puzzle TARGET_NAME )
