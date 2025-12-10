@@ -1,14 +1,13 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
+#include <limits>
 #include <ranges>
 #include <string_view>
 #include <utility>
 #include <vector>
 
 #include "../common.hpp"
-
-constexpr std::int64_t kMatchCount{1000};
 
 constexpr std::string_view kExampleInput{
     "162,817,812\n"
@@ -65,13 +64,13 @@ std::ostream& operator<<(std::ostream& os, const Distance& point)
     return os;
 }
 
-auto measure_distance(const Coord& lhs, const Coord& rhs) noexcept
+constexpr auto measure_distance(const Coord& lhs, const Coord& rhs) noexcept
 {
     auto diff = rhs - lhs;
-    return std::sqrt<std::int64_t>((diff.x * diff.x + diff.y * diff.y + diff.z * diff.z));
+    return (diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
 }
 
-auto compute_distances(const std::vector<Coord>& junctions) noexcept
+constexpr auto compute_distances(const std::vector<Coord>& junctions) noexcept
 {
     auto count = junctions.size();
     std::vector<Distance> distances;
@@ -92,11 +91,12 @@ auto compute_distances(const std::vector<Coord>& junctions) noexcept
     return distances;
 }
 
-constexpr void match_circuits(const std::vector<Distance>& distances, std::vector<Coord>& junctions) noexcept
+constexpr auto match_circuits(const std::vector<Distance>& distances, std::vector<Coord>& junctions) noexcept
 {
+    std::int64_t match_count{1};
     while (true) {
         std::optional<std::pair<std::int64_t, std::int64_t>> mapping;
-        for (std::int64_t i = 0; i < kMatchCount; ++i) {
+        for (std::int64_t i = 0; i <= match_count; ++i) {
             const auto& distance = distances[i];
             if (junctions[distance.lhs].group == junctions[distance.rhs].group) continue;
             mapping = std::make_pair(
@@ -104,16 +104,23 @@ constexpr void match_circuits(const std::vector<Distance>& distances, std::vecto
                 std::min(junctions[distance.lhs].group, junctions[distance.rhs].group));
             break;
         }
-        if (!mapping.has_value()) return;
-        for (auto& junction : junctions) {
-            if (junction.group == mapping->first) {
-                junction.group = mapping->second;
+        if (mapping.has_value()) {
+            for (auto& junction : junctions) {
+                if (junction.group == mapping->first) {
+                    junction.group = mapping->second;
+                }
             }
+            continue;
         }
+        auto same_group = std::all_of(
+            junctions.begin() + 1, junctions.end(), [&](const auto& j) { return j.group == junctions.front().group; });
+        if (same_group) break;
+        ++match_count;
     }
+    return match_count;
 }
 
-auto solve(std::string_view input) noexcept -> std::int64_t
+constexpr auto solve(std::string_view input) noexcept -> std::int64_t
 {
     std::int64_t group_idx{0};
     std::vector<Coord> junctions;
@@ -132,19 +139,14 @@ auto solve(std::string_view input) noexcept -> std::int64_t
                 .group = group_idx++,
             });
     });
-
     auto distances = compute_distances(junctions);
-    match_circuits(distances, junctions);
-
-    std::vector<std::int64_t> circuits_length(junctions.size());
-    for (const auto& junction : junctions) {
-        ++circuits_length[junction.group];
-    }
-    std::ranges::sort(circuits_length, std::greater<>{});
-    return std::ranges::fold_left(circuits_length | std::views::take(3), 1, std::multiplies<>{});
+    auto match_count = match_circuits(distances, junctions);
+    const auto& distance = distances[match_count];
+    return junctions[distance.lhs].x * junctions[distance.rhs].x;
 }
 
 int main(int argc, char* argv[])
 {
+    static_assert(solve(kExampleInput) == 25272);
     run_solution(argc, argv, kExampleInput, solve);
 }
